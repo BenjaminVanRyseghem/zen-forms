@@ -1,0 +1,60 @@
+{
+  "name": "zen-forms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "NODE_ENV=production rollup -c",
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "forms",
+    "react",
+    "formik"
+  ],
+  "author": "Benjamin Van Ryseghem <benjamin.vanryseghem@gmail.com> (https://benjamin.vanryseghem.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "formik": "^2.1.4",
+    "reactstrap-formik": "^1.0.9"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.3",
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/plugin-transform-runtime": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "@babel/preset-react": "^7.10.1",
+    "@rollup/plugin-babel": "^5.0.4",
+    "@rollup/plugin-node-resolve": "^8.1.0",
+    "@storybook/addon-actions": "^5.3.19",
+    "@storybook/core": "^5.3.19",
+    "babel-loader": "^8.1.0",
+    "babel-preset-react-app": "^9.1.2",
+    "eslint": "^7.3.1",
+    "eslint-config-benjamin-van-ryseghem": "^1.1.0",
+    "eslint-plugin-import": "^2.21.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "reactstrap": "^8.5.1",
+    "rollup": "^2.18.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-peer-deps-external": "^2.2.2",
+    "rollup-plugin-sass": "^1.2.2",
+    "sass": "^1.26.9",
+    "sass-loader": "^8.0.2",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "yup": "^0.29.1"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "reactstrap": "^8.5.1"
+  }
+}

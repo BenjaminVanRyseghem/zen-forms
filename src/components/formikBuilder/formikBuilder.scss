@@ -1,0 +1,58 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/mixins";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/grid";
+
+.zen-form.inline {
+  .form-control.is-invalid {
+    padding-right: 0.75rem;
+  }
+
+  .form-group {
+    @extend .row;
+    align-items: start;
+  }
+
+  .row > * {
+    width: 100%;
+  }
+
+  .form-control.is-invalid[type=number] {
+    background-position: right calc(.375em + .1875rem + 20px) center;
+  }
+
+  .invalid-feedback {
+    @extend .col-sm-12;
+  }
+
+  label:not(:empty) {
+    margin-top: .5rem;
+
+    &.required {
+      &:after {
+        content: "\00a0*";
+      }
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .invalid-feedback {
+    @extend .offset-sm-5;
+    @extend .col-sm-7;
+    padding-left: 0;
+  }
+
+  .form-group > label:not(:empty) {
+    @extend .col-md-5;
+  }
+
+  .form-group > label + * {
+    @extend .col-md-7;
+  }
+}
