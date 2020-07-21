@@ -1,21 +1,59 @@
-import { Button } from "reactstrap";
+import { Button, FormGroup } from "reactstrap";
+import ReactstrapInput, { ReactstrapRadio } from "../inputs/reactstrapInput/reactstrapInput";
 import { Field } from "formik";
 import FormikBuilder from "../formikBuilder/formikBuilder";
 import PropTypes from "prop-types";
 import React from "react";
-import ReactstrapInput from "../inputs/reactstrapInput/reactstrapInput";
 
 export default class FormikReactstrapBuilder extends FormikBuilder {
+	static defaultProps = {
+		grid: {
+			size: 8,
+			type: "md"
+		}
+	};
+
 	static propTypes = {
 		...FormikBuilder.propTypes,
+		grid: PropTypes.shape({
+			size: PropTypes.number,
+			type: PropTypes.string
+		}),
 		readOnly: PropTypes.bool
 	};
 
-	renderAsDropdown(dropdown, { validationSchema, values, setFieldValue, readOnly }) {
-		if (!dropdown.shouldShow(values)) {
-			return null;
-		}
+	renderAsRadioGroup(radioGroup, ...args) {
+		let inline = radioGroup.isInlined();
 
+		return (
+			<FormGroup row className="radio-group" tag="fieldset">
+				{radioGroup.label() && <div className="col-form-label">{radioGroup.label()}</div>}
+				<div className="radio-group-content">
+					{radioGroup.children().map((child) => child.render(this, {
+						...args,
+						name: radioGroup.id(),
+						inline
+					}))}
+				</div>
+			</FormGroup>
+		);
+	}
+
+	renderAsRadio(radio, { name, inline }) {
+		return (
+			<Field
+				component={ReactstrapRadio}
+				id={radio.id()}
+				inline={inline}
+				label={` ${radio.label()}`}
+				name={name}
+				type="radio"
+				value={radio.id()}
+			/>
+		);
+	}
+
+	renderAsDropdown(dropdown, { validationSchema, values, setFieldValue, readOnly }) {
 		let children = dropdown.values();
 		let id = dropdown.id();
 		return (
@@ -44,11 +82,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsInput(input, { validationSchema, values, readOnly }) {
-		if (!input.shouldShow(values)) {
-			return null;
-		}
-
+	renderAsInput(input, { validationSchema, readOnly }) {
 		let addMinMax = input.type() === "date" || input.type() === "number";
 
 		return (
@@ -61,6 +95,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				min={addMinMax ? input.min() : ""}
 				multiple={input.isMultiple()}
 				name={input.id()}
+				placeholder={input.getPlaceholder()}
 				readOnly={readOnly}
 				type={input.type()}
 				validationSchema={validationSchema}
@@ -68,11 +103,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsTextArea(textArea, { validationSchema, values, readOnly }) {
-		if (!textArea.shouldShow(values)) {
-			return null;
-		}
-
+	renderAsTextArea(textArea, { validationSchema, readOnly }) {
 		return (
 			<Field
 				key={textArea.id()}
@@ -88,7 +119,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 	}
 
 	cssClass() {
-		return "formikReactstrapBuilder";
+		return `formikReactstrapBuilder grid-type-${this.props.grid.type || "md"} grid-size-${this.props.grid.size || 8}`;
 	}
 
 	buildFormikProps(formikProps) {

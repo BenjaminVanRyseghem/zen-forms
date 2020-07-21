@@ -10,10 +10,20 @@ export default class Input extends AbstractInput {
 		this._min = undefined;
 		this._max = undefined;
 		this._multiple = false;
+		this._placeholder = undefined;
 	}
 
 	type() {
 		return this._type;
+	}
+
+	placeholder(string) {
+		this._placeholder = string;
+		return this;
+	}
+
+	getPlaceholder() {
+		return this._placeholder;
 	}
 
 	min(min) {
@@ -43,7 +53,7 @@ export default class Input extends AbstractInput {
 		return this._multiple;
 	}
 
-	render(renderer, ...args) {
+	renderContent(renderer, ...args) {
 		return renderer.renderAsInput(this, ...args);
 	}
 }

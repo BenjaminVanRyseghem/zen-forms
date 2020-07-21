@@ -31,7 +31,7 @@ export default class Dropdown extends AbstractInput {
 		return this._values;
 	}
 
-	render(renderer, ...args) {
+	renderContent(renderer, ...args) {
 		return renderer.renderAsDropdown(this, ...args);
 	}
 }

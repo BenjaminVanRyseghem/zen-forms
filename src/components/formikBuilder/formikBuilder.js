@@ -6,18 +6,25 @@ import React from "react";
 export default class FormikBuilder extends React.Component {
 	static defaultProps = {
 		additionalData: {},
+		component: Form,
 		formClassName: "",
 		inline: false,
-		onSubmit: () => {}
+		onSubmit: () => {},
+		submitOnChange: false
 	};
 
 	static propTypes = {
 		additionalData: PropTypes.object,
+		component: PropTypes.oneOfType([
+			PropTypes.func,
+			PropTypes.string
+		]),
 		formClassName: PropTypes.string,
 		initialValues: PropTypes.object.isRequired,
 		inline: PropTypes.bool,
 		onSubmit: PropTypes.func,
 		spec: PropTypes.array.isRequired,
+		submitOnChange: PropTypes.bool,
 		validationSchema: PropTypes.object
 	};
 
@@ -60,6 +67,39 @@ export default class FormikBuilder extends React.Component {
 		);
 	}
 
+	renderAsGroup(group, ...args) {
+		if (!group.id()) {
+			return group.children().map((child) => child.render(this, ...args));
+		}
+
+		return (
+			<div id={group.id()}>
+				{group.children().map((child) => child.render(this, ...args))}
+			</div>
+		);
+	}
+
+	renderAsRadioGroup(radioGroup, ...args) {
+		return (
+			<div aria-labelledby={radioGroup.id()} className={radioGroup.isInlined() ? "inline" : ""} role="group">
+				{radioGroup.children().map((child) => child.render(this, {
+					...args,
+					name: radioGroup.id(),
+					inline: radioGroup.isInlined()
+				}))}
+			</div>
+		);
+	}
+
+	renderAsRadio(radio, { name, inline }) {
+		return (
+			<label key={radio.id()}>
+				<Field id={radio.id()} inline={inline} name={name} type="radio" value={radio.id()}/>
+				{radio.label()}
+			</label>
+		);
+	}
+
 	renderAsDropdown(dropdown) {
 		return (
 			<Field as="select" id={dropdown.id()} name={dropdown.id()}>
@@ -71,7 +111,7 @@ export default class FormikBuilder extends React.Component {
 	renderAsInput(input, { errors, touched }) {
 		return (
 			<>
-				<Field id={input.id()} name={input.id()}/>
+				<Field id={input.id()} name={input.id()} placeholder={input.getPlaceholder()}/>
 				{
 					this.props.validationSchema && errors[input.id()] && touched[input.id()]
 						? <div>{errors[input.id()]}</div>
@@ -100,12 +140,29 @@ export default class FormikBuilder extends React.Component {
 					onSubmit={this.props.onSubmit}
 				>
 					{(formikProps) => {
+						if (this.props.submitOnChange) {
+							((fn) => {
+								formikProps.getFieldProps = (...args) => {
+									let props = fn(...args);
+
+									((innerFn) => {
+										props.onChange = (...innerArgs) => {
+											innerFn(...innerArgs);
+											formikProps.handleSubmit();
+										};
+									})(props.onChange);
+
+									return props;
+								};
+							})(formikProps.getFieldProps);
+						}
 						let formProps = this.buildFormikProps(formikProps);
-						return (
-							<Form className={this.props.formClassName}>
-								{this.renderChildren(formProps)}
-								{this.renderSubmit(formProps)}
-							</Form>
+
+						return React.createElement(
+							this.props.component || Form,
+							{ className: this.props.formClassName },
+							this.renderChildren(formProps),
+							!this.props.submitOnChange && this.renderSubmit(formProps)
 						);
 					}}
 				</Formik>

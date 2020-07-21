@@ -2,7 +2,7 @@
 
 export default class AbstractInput {
 	constructor(id, showFn = () => true) {
-		if (!id) {
+		if (id === undefined) {
 			throw new Error("[AbstractInput/constructor] `id` is mandatory");
 		}
 
@@ -27,8 +27,17 @@ export default class AbstractInput {
 		return this;
 	}
 
+	render(renderer, ...args) {
+		let [{ values }] = args || [{}];
+		if (!this._showFn(values)) {
+			return null;
+		}
+
+		return this.renderContent(renderer, ...args);
+	}
+
 	// eslint-disable-next-line react/require-render-return,no-unused-vars
-	render(renderer) {
-		throw Error("[AbstractInput/render] Must be overridden");
+	renderContent(renderer, ...args) {
+		throw Error("[AbstractInput/renderContent] Must be overridden");
 	}
 }

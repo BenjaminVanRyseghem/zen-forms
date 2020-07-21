@@ -33,8 +33,6 @@ const validation = Yup.object().shape({
                    		.required("Required")
                    });
 
-// ...
-
 function CreateAPersonForm() {
     return (
         <FormikReactstrapBuilder

@@ -3,56 +3,76 @@
 @import "node_modules/bootstrap/scss/variables";
 @import "node_modules/bootstrap/scss/grid";
 
-.zen-form.inline {
-  .form-control.is-invalid {
-    padding-right: 0.75rem;
-  }
+$types: map-keys($grid-breakpoints);
 
-  .form-group {
-    @extend .row;
-    align-items: start;
-  }
+.zen-form {
+  @for $i from 1 through 12 {
+    &.grid-size-#{$i} {
+      @each $type in $types {
+        &.grid-type-#{$type} {
+          .radio-group {
+            .col-form-label {
+              @extend .col-#{$type}-#{12 - $i} !optional;
+            }
 
-  .row > * {
-    width: 100%;
-  }
+            .radio-group-content {
+              @extend .col-#{$type}-#{$i} !optional;
+              padding: 0;
+            }
+          }
 
-  .form-control.is-invalid[type=number] {
-    background-position: right calc(.375em + .1875rem + 20px) center;
-  }
+          &.inline {
+            .invalid-feedback {
+              @extend .offset-#{$type}-#{12 - $i} !optional;
+              @extend .col-#{$type}-#{$i} !optional;
+            }
 
-  .invalid-feedback {
-    @extend .col-sm-12;
-  }
+            .form-group > label:not(:empty) {
+              @extend .col-#{$type}-#{12 - $i} !optional;
+            }
 
-  label:not(:empty) {
-    margin-top: .5rem;
-
-    &.required {
-      &:after {
-        content: "\00a0*";
+            .form-group > label + * {
+              @extend .col-#{$type}-#{$i} !optional;
+            }
+          }
+        }
       }
     }
   }
 
-  .form-group {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -15px;
-    margin-left: -15px;
-  }
+  &.inline {
+    .form-control.is-invalid {
+      padding-right: 0.75rem;
+    }
 
-  .invalid-feedback {
-    @extend .offset-sm-5;
-    @extend .col-sm-7;
-    padding-left: 0;
-  }
+    .form-group {
+      @extend .row;
+      align-items: start;
+      display: flex;
+      flex-wrap: wrap;
+      margin-right: 0;
+    }
 
-  .form-group > label:not(:empty) {
-    @extend .col-md-5;
-  }
+    .row > * {
+      width: 100%;
+    }
 
-  .form-group > label + * {
-    @extend .col-md-7;
+    .form-control.is-invalid[type=number] {
+      background-position: right calc(.375em + .1875rem + 20px) center;
+    }
+
+    label:not(:empty) {
+      margin-top: .5rem;
+
+      &.required {
+        &:after {
+          content: "\00a0*";
+        }
+      }
+    }
+
+    .invalid-feedback {
+      padding-left: 0;
+    }
   }
 }
