@@ -26,7 +26,14 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		let inline = radioGroup.isInlined();
 
 		return (
-			<FormGroup row className="radio-group" tag="fieldset">
+			<FormGroup
+				key={radioGroup.id()}
+				row
+				className="radio-group"
+				data-id={radioGroup.id()}
+				id={this.buildElementId(args[0].formId, radioGroup.id())}
+				tag="fieldset"
+			>
 				{radioGroup.label() && <div className="col-form-label">{radioGroup.label()}</div>}
 				<div className="radio-group-content">
 					{radioGroup.children().map((child) => child.render(this, {
@@ -39,28 +46,30 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsRadio(radio, { name, inline }) {
+	renderAsRadio(radio, { formId, name, inline }) {
 		return (
 			<Field
+				key={radio.id()}
 				component={ReactstrapRadio}
-				id={radio.id()}
+				data-id={radio.id()}
+				id={this.buildElementId(formId, radio.id())}
 				inline={inline}
 				label={` ${radio.label()}`}
 				name={name}
-				type="radio"
 				value={radio.id()}
 			/>
 		);
 	}
 
-	renderAsDropdown(dropdown, { validationSchema, values, setFieldValue, readOnly }) {
+	renderAsDropdown(dropdown, { formId, validationSchema, values, setFieldValue, readOnly }) {
 		let children = dropdown.values();
 		let id = dropdown.id();
 		return (
 			<Field
 				key={id}
 				component={ReactstrapInput}
-				id={id}
+				data-id={id}
+				id={this.buildElementId(formId, id)}
 				label={dropdown.label()}
 				multiple={dropdown.isMultiple()}
 				name={id}
@@ -82,17 +91,18 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsInput(input, { validationSchema, readOnly }) {
+	renderAsInput(input, { formId, validationSchema, readOnly }) {
 		let addMinMax = input.type() === "date" || input.type() === "number";
 
 		return (
 			<Field
 				key={input.id()}
 				component={ReactstrapInput}
-				id={input.id()}
+				data-id={input.id()}
+				id={this.buildElementId(formId, input.id())}
 				label={input.label()}
-				max={addMinMax ? input.max() : ""}
-				min={addMinMax ? input.min() : ""}
+				max={addMinMax ? input.max() : null}
+				min={addMinMax ? input.min() : null}
 				multiple={input.isMultiple()}
 				name={input.id()}
 				placeholder={input.getPlaceholder()}
@@ -103,12 +113,13 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsTextArea(textArea, { validationSchema, readOnly }) {
+	renderAsTextArea(textArea, { formId, validationSchema, readOnly }) {
 		return (
 			<Field
 				key={textArea.id()}
 				component={ReactstrapInput}
-				id={textArea.id()}
+				data-id={textArea.id()}
+				id={this.buildElementId(formId, textArea.id())}
 				label={textArea.label()}
 				name={textArea.id()}
 				readOnly={readOnly}

@@ -6,6 +6,31 @@
 $types: map-keys($grid-breakpoints);
 
 .zen-form {
+  &.inline {
+    .form-group[data-type="checkbox"] {
+      flex-direction: row-reverse;
+      align-items: baseline;
+      justify-content: flex-end;
+
+      .checkbox-wrapper {
+        padding-left: 0 !important;
+
+        .form-check-input {
+          margin-left: 0;
+          position: relative;
+        }
+      }
+    }
+
+    .form-check-label {
+      width: 100%;
+    }
+
+    .form-group[data-type="checkbox"], .form-group[data-type="radio"] {
+      margin-right: 1ch;
+    }
+  }
+
   @for $i from 1 through 12 {
     &.grid-size-#{$i} {
       @each $type in $types {
@@ -27,11 +52,11 @@ $types: map-keys($grid-breakpoints);
               @extend .col-#{$type}-#{$i} !optional;
             }
 
-            .form-group > label:not(:empty) {
+            .form-group:not([data-type="checkbox"]) > label:not(:empty), .form-group:not([data-type="radio"]) > label:not(:empty) {
               @extend .col-#{$type}-#{12 - $i} !optional;
             }
 
-            .form-group > label + * {
+            .form-group:not([data-type="checkbox"]) > label:not(:empty) + *, .form-group:not([data-type="radio"]) > label:not(:empty) + * {
               @extend .col-#{$type}-#{$i} !optional;
             }
           }
