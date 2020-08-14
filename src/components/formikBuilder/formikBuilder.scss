@@ -7,7 +7,18 @@ $types: map-keys($grid-breakpoints);
 
 .zen-form {
   &.inline {
-    .form-group[data-type="checkbox"] {
+    .reactstrapRadio.read-only {
+      padding-left: 0;
+    }
+
+    .form-group[data-type="checkbox"]:not(.compact), .form-group[data-type="radio"]:not(.compact) {
+      .form-check-input {
+        flex: 0 0 !important;
+        margin-left: 0;
+      }
+    }
+
+    .form-group[data-type="checkbox"].compact, .form-group[data-type="radio"].compact {
       flex-direction: row-reverse;
       align-items: baseline;
       justify-content: flex-end;
@@ -26,7 +37,7 @@ $types: map-keys($grid-breakpoints);
       width: 100%;
     }
 
-    .form-group[data-type="checkbox"], .form-group[data-type="radio"] {
+    .form-group[data-type="checkbox"].compact, .form-group[data-type="radio"].compact {
       margin-right: 1ch;
     }
   }
@@ -72,8 +83,8 @@ $types: map-keys($grid-breakpoints);
 
     .form-group {
       @extend .row;
-      align-items: start;
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
       margin-right: 0;
     }
@@ -98,6 +109,13 @@ $types: map-keys($grid-breakpoints);
 
     .invalid-feedback {
       padding-left: 0;
+    }
+
+    fieldset {
+      .form-group {
+        margin-left: 0;
+        margin-bottom: 0;
+      }
     }
   }
 }

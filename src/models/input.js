@@ -11,6 +11,7 @@ export default class Input extends AbstractInput {
 		this._max = undefined;
 		this._multiple = false;
 		this._placeholder = undefined;
+		this._compact = false;
 	}
 
 	type() {
@@ -20,6 +21,15 @@ export default class Input extends AbstractInput {
 	placeholder(string) {
 		this._placeholder = string;
 		return this;
+	}
+
+	compact() {
+		this._compact = true;
+		return this;
+	}
+
+	isCompact() {
+		return this._compact;
 	}
 
 	getPlaceholder() {

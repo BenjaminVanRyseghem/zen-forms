@@ -36,12 +36,23 @@ export default class FormikBuilder extends React.Component {
 
 	state = {};
 
+	resolve(value, ...args) {
+		if (typeof value === "function") {
+			return value(...args);
+		}
+
+		return value;
+	}
+
 	cssClass() {
 		return "formikBuilder";
 	}
 
-	buildElementId(formId, id) {
-		return `${formId}-${id}`;
+	buildElementId(first, ...others) {
+		let result = `${first}`;
+		others.forEach((each) => (result += `-${each}`));
+
+		return result;
 	}
 
 	buildFormikProps(formikProps) {
@@ -69,7 +80,12 @@ export default class FormikBuilder extends React.Component {
 	renderAsTextArea(textArea, { errors, touched, formId }) {
 		return (
 			<>
-				<Field as="textarea" data-id={textArea.id()} id={this.buildElementId(formId, textArea.id())} name={textArea.id()}/>
+				<Field
+					as="textarea"
+					data-id={textArea.id()}
+					id={this.buildElementId(formId, textArea.id())}
+					name={textArea.id()}
+				/>
 				{
 					this.props.validationSchema && errors[textArea.id()] && touched[textArea.id()]
 						? <div>{errors[textArea.id()]}</div>
@@ -81,12 +97,12 @@ export default class FormikBuilder extends React.Component {
 
 	renderAsGroup(group, ...args) {
 		if (!group.id()) {
-			return group.children().map((child) => child.render(this, ...args));
+			return group.children().map((child) => this.renderChild(child, ...args));
 		}
 
 		return (
 			<div key={group.id()} data-id={group.id()} id={this.buildElementId(args[0].formId, group.id())}>
-				{group.children().map((child) => child.render(this, ...args))}
+				{group.children().map((child) => this.renderChild(child, ...args))}
 			</div>
 		);
 	}
@@ -96,15 +112,15 @@ export default class FormikBuilder extends React.Component {
 			<div
 				key={radioGroup.id()}
 				aria-labelledby={radioGroup.id()}
-				className={radioGroup.isInlined() ? "inline" : ""}
+				className={this.resolve(radioGroup.isInlined(), ...args) ? "inline" : ""}
 				data-id={radioGroup.id()}
 				id={this.buildElementId(args[0].formId, radioGroup.id())}
 				role="group"
 			>
-				{radioGroup.children().map((child) => child.render(this, {
+				{radioGroup.children().map((child) => this.renderChild(child, {
 					...args,
 					name: radioGroup.id(),
-					inline: radioGroup.isInlined()
+					inline: this.resolve(radioGroup.isInlined(), ...args)
 				}))}
 			</div>
 		);
@@ -113,29 +129,51 @@ export default class FormikBuilder extends React.Component {
 	renderAsRadio(radio, { name, inline, formId }) {
 		return (
 			<label key={radio.id()} data-id={radio.id()}>
-				<Field id={this.buildElementId(formId, radio.id())} inline={inline} name={name} type="radio" value={radio.id()}/>
+				<Field
+					id={this.buildElementId(formId, radio.id())}
+					inline={inline}
+					name={name}
+					type="radio"
+					value={radio.id()}
+				/>
 				{radio.label()}
 			</label>
 		);
 	}
 
-	renderAsDropdown(dropdown, { formId }) {
+	renderAsDropdown(dropdown, options) {
+		let { formId } = options;
 		return (
-			<Field key={dropdown.id()} as="select" data-id={dropdown.id()} id={this.buildElementId(formId, dropdown.id())} name={dropdown.id()}>
-				{dropdown.values().map(({ key, label }) => <option key={key} value={key}>{label}</option>)}
+			<Field
+				key={dropdown.id()}
+				as="select"
+				data-id={dropdown.id()}
+				id={this.buildElementId(formId, dropdown.id())}
+				name={dropdown.id()}
+			>
+				{dropdown.options().map(({ key, label }) => <option
+					key={key}
+					value={key}
+				>
+					{this.resolve(label, options)}
+				</option>)}
 			</Field>
 		);
 	}
 
-	renderAsInput(input, { errors, formId, touched }) {
+	renderAsInput(input, options) {
+		let { errors, formId, touched } = options;
 		return (
 			<>
 				<Field
 					key={input.id()}
+					className={input.isCompact() ? "compact" : ""}
 					data-id={input.id()}
+					disabled={this.resolve(input.isDisabled(), options)}
 					id={this.buildElementId(formId, input.id())}
 					name={input.id()}
 					placeholder={input.getPlaceholder()}
+					onClick={input.getClickHandler()}
 				/>
 				{
 					this.props.validationSchema && errors[input.id()] && touched[input.id()]
@@ -146,8 +184,25 @@ export default class FormikBuilder extends React.Component {
 		);
 	}
 
-	renderChildren(formProps) {
-		return this.props.spec.map((input) => input.render(this, formProps));
+	renderChild(child, options) {
+		if (typeof child === "function") {
+			return this.renderChildren(child(options), options);
+		}
+
+		return child.render(this, options);
+	}
+
+	renderChildren(children, options) {
+		let nodes = children;
+		if (nodes.constructor !== Array) {
+			return this.renderChild(nodes, options);
+		}
+
+		return nodes.map((node) => this.renderChild(node, options));
+	}
+
+	renderSpec(children, options) {
+		return this.renderChildren(children, options);
 	}
 
 	renderSubmit(formProps) {
@@ -165,23 +220,30 @@ export default class FormikBuilder extends React.Component {
 					onSubmit={this.props.onSubmit}
 				>
 					{(formikProps) => {
-						if (this.props.submitOnChange) {
-							((fn) => {
-								formikProps.getFieldProps = (...args) => {
-									let props = fn(...args);
-
-									((innerFn) => {
-										props.onChange = (...innerArgs) => {
-											innerFn(...innerArgs);
-											formikProps.handleSubmit();
-										};
-									})(props.onChange);
-
-									return props;
-								};
-							})(formikProps.getFieldProps);
-						}
 						let formProps = this.buildFormikProps(formikProps);
+
+						((fn) => {
+							formikProps.getFieldProps = (...args) => {
+								let props = fn(...args);
+								((innerFn) => {
+									props.onChange = (...innerArgs) => {
+										let [{ _targetInst, target }] = innerArgs;
+										if (_targetInst) {
+											let { transform } = _targetInst.pendingProps;
+											if (transform) {
+												target.value = transform(target.value, formProps, ...args);
+											}
+										}
+										innerFn(...innerArgs);
+										if (this.props.submitOnChange) {
+											formikProps.handleSubmit();
+										}
+									};
+								})(props.onChange);
+
+								return props;
+							};
+						})(formikProps.getFieldProps);
 
 						return React.createElement(
 							this.props.component || Form,
@@ -189,7 +251,7 @@ export default class FormikBuilder extends React.Component {
 								className: this.props.formClassName,
 								id: this.props.formId
 							},
-							this.renderChildren(formProps),
+							this.renderSpec(this.props.spec, formProps),
 							!this.props.submitOnChange && this.renderSubmit(formProps)
 						);
 					}}

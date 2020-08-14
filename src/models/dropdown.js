@@ -4,7 +4,7 @@ export default class Dropdown extends AbstractInput {
 	constructor() {
 		super(...arguments); // eslint-disable-line prefer-rest-params
 
-		this._values = [];
+		this._options = [];
 		this._multiple = false;
 	}
 
@@ -17,8 +17,8 @@ export default class Dropdown extends AbstractInput {
 		return this._multiple;
 	}
 
-	value(key, label, conditionFn = () => true) {
-		this._values.push({
+	option(key, label, conditionFn = () => true) {
+		this._options.push({
 			key,
 			label,
 			conditionFn
@@ -27,8 +27,8 @@ export default class Dropdown extends AbstractInput {
 		return this;
 	}
 
-	values() {
-		return this._values;
+	options() {
+		return this._options;
 	}
 
 	renderContent(renderer, ...args) {

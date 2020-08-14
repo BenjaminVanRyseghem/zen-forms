@@ -8,10 +8,45 @@ export default class AbstractInput {
 
 		this._id = id;
 		this._showFn = showFn;
+		this._transform = null;
+		this._format = null;
+		this._disabled = false;
+		this._readOnly = false;
 	}
 
 	id() {
+		return this.baseId();
+	}
+
+	baseId() {
 		return this._id;
+	}
+
+	disabled(boolOrFn = true) {
+		this._disabled = boolOrFn;
+		return this;
+	}
+
+	isDisabled() {
+		return this._disabled;
+	}
+
+	readOnly(boolOrFn = true) {
+		this._readOnly = boolOrFn;
+		return this;
+	}
+
+	isReadOnly() {
+		return this._readOnly || (() => false);
+	}
+
+	onClick(fn) {
+		this._onClick = fn;
+		return this;
+	}
+
+	getClickHandler() {
+		return this._onClick;
 	}
 
 	shouldShow(...args) {
@@ -27,9 +62,27 @@ export default class AbstractInput {
 		return this;
 	}
 
+	transform(fn) {
+		if (fn === undefined) {
+			return this._transform;
+		}
+
+		this._transform = fn;
+		return this;
+	}
+
+	format(fn) {
+		if (fn === undefined) {
+			return this._format;
+		}
+
+		this._format = fn;
+		return this;
+	}
+
 	render(renderer, ...args) {
-		let [{ values }] = args || [{}];
-		if (!this._showFn(values)) {
+		let [options] = args || [{}];
+		if (!this._showFn(options)) {
 			return null;
 		}
 

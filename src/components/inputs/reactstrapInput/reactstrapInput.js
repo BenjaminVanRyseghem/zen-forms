@@ -1,5 +1,6 @@
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import isRequired from "../../../helpers/isRequired";
+import objectPath from "object-path";
 import React from "react";
 
 export function ReactstrapRadio(ref) {
@@ -9,6 +10,8 @@ export function ReactstrapRadio(ref) {
 		groupClassName = "",
 		validationSchema,
 		inline,
+		value,
+		groupName,
 		...rest
 	} = ref;
 	let dataId = rest["data-id"];
@@ -25,9 +28,16 @@ export function ReactstrapRadio(ref) {
 	);
 
 	return (
-		<FormGroup check className={`reactstrapRadio radio ${groupClassName}`} data-id={dataId} inline={inline}>
+		<FormGroup check className={`reactstrapRadio radio ${groupClassName} ${inputProps.readOnly ? "read-only" : ""}`} data-id={dataId} inline={inline}>
 			<Label check className={required ? "required" : ""}>
-				<Input {...inputProps} required={required}/>
+				{!inputProps.readOnly && <Input
+					{...inputProps}
+					checked={objectPath.get(form.values, groupName) === value}
+					disabled={inputProps.disabled || inputProps.readOnly}
+					required={required}
+					type="radio"
+					value={value}
+				/>}
 				{rest.label}
 			</Label>
 			{touched[field.name] && errors[field.name]
@@ -41,6 +51,8 @@ export default function ReactstrapInput(ref) {
 	let {
 		field,
 		form,
+		compact,
+		format, // eslint-disable-line no-unused-vars
 		groupClassName = "",
 		validationSchema,
 		...rest
@@ -58,11 +70,16 @@ export default function ReactstrapInput(ref) {
 
 	let { type = "text" } = inputProps;
 
-	if (type === "checkbox" || type === "radio") {
+	if ((type === "checkbox" || type === "radio") && compact) {
 		return (
-			<FormGroup check className={`reactstrapInput ${type} ${groupClassName}`} data-type={type}>
+			<FormGroup check className={`reactstrapInput compact ${type} ${groupClassName}`} data-type={type}>
 				{rest.label && <Label check className={required ? "required" : ""}>
-					<Input {...inputProps} checked={inputProps.value} required={required}/>
+					<Input
+						{...inputProps}
+						checked={inputProps.value}
+						disabled={inputProps.disabled || inputProps.readOnly}
+						required={required}
+					/>
 					{rest.label}
 				</Label>}
 				{touched[field.name] && errors[field.name]
@@ -72,10 +89,21 @@ export default function ReactstrapInput(ref) {
 		);
 	}
 
+	if ((type === "checkbox" || type === "radio" || type === "select") && inputProps.readOnly) {
+		inputProps.disabled = true;
+	}
+
 	return (
 		<FormGroup className={`reactstrapInput ${type} ${groupClassName}`} data-type={type}>
 			{rest.label && <Label className={required ? "required" : ""}>{rest.label}</Label>}
-			<Input {...inputProps} required={required}/>
+			<Input
+				{...inputProps}
+				required={required}
+				value={format ? format(inputProps.value, ref) : inputProps.value}
+				onClick={inputProps.onClick
+					? function onClick(event) { return inputProps.onClick(event, ref); }
+					: undefined}
+			/>
 			{touched[field.name] && errors[field.name]
 				? <FormFeedback>{errors[field.name]}</FormFeedback>
 				: ""}
