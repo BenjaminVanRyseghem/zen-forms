@@ -104,7 +104,7 @@ class MyFormBuilder extends FormikReactstrapBuilder {
     
     		return (
     			<FormGroup className="reactstrapGroupedInput grouped-input" id={id}>
-    				<Label className={required ? "required" : ""}>{groupedInput.label()}</Label>
+    				<Label className={required ? "required" : ""}>{groupedInput.getLabel()}</Label>
     				<div className="content">
     					<div className="flex-container">
     						{groupedInput.children().map((child) => child.render(this, ...args))}

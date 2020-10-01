@@ -14,6 +14,7 @@ export default class FormikBuilder extends React.Component {
 		component: Form,
 		formClassName: "",
 		inline: false,
+		noSubmitButton: false,
 		onSubmit: () => {},
 		submitOnChange: false
 	};
@@ -28,6 +29,7 @@ export default class FormikBuilder extends React.Component {
 		formId: PropTypes.string,
 		initialValues: PropTypes.object.isRequired,
 		inline: PropTypes.bool,
+		noSubmitButton: PropTypes.bool,
 		onSubmit: PropTypes.func,
 		spec: PropTypes.array.isRequired,
 		submitOnChange: PropTypes.bool,
@@ -136,7 +138,7 @@ export default class FormikBuilder extends React.Component {
 					type="radio"
 					value={radio.id()}
 				/>
-				{radio.label()}
+				{radio.getLabel()}
 			</label>
 		);
 	}
@@ -151,9 +153,9 @@ export default class FormikBuilder extends React.Component {
 				id={this.buildElementId(formId, dropdown.id())}
 				name={dropdown.id()}
 			>
-				{dropdown.options().map(({ key, label }) => <option
-					key={key}
-					value={key}
+				{this.resolve(dropdown.options(), options).map(({ value, label }) => <option
+					key={value}
+					value={value}
 				>
 					{this.resolve(label, options)}
 				</option>)}
@@ -211,6 +213,18 @@ export default class FormikBuilder extends React.Component {
 		);
 	}
 
+	renderContent(formProps) {
+		return React.createElement(
+			this.props.component || Form,
+			{
+				className: this.props.formClassName,
+				id: this.props.formId
+			},
+			this.renderSpec(this.props.spec, formProps),
+			(!this.props.noSubmitButton || !this.props.submitOnChange) && this.renderSubmit(formProps)
+		);
+	}
+
 	render() {
 		return (
 			<div className={`zen-form ${this.cssClass()} ${this.props.inline ? "inline" : ""}`}>
@@ -245,15 +259,7 @@ export default class FormikBuilder extends React.Component {
 							};
 						})(formikProps.getFieldProps);
 
-						return React.createElement(
-							this.props.component || Form,
-							{
-								className: this.props.formClassName,
-								id: this.props.formId
-							},
-							this.renderSpec(this.props.spec, formProps),
-							!this.props.submitOnChange && this.renderSubmit(formProps)
-						);
+						return this.renderContent(formProps);
 					}}
 				</Formik>
 			</div>
