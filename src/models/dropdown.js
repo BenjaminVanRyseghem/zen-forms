@@ -17,9 +17,14 @@ export default class Dropdown extends AbstractInput {
 		return this._multiple;
 	}
 
-	option(key, label, conditionFn = () => true) {
+	mapOptions(fn) {
+		this._options = fn;
+		return this;
+	}
+
+	option(value, label, conditionFn = () => true) {
 		this._options.push({
-			key,
+			value,
 			label,
 			conditionFn
 		});

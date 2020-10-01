@@ -1,4 +1,5 @@
 import { Button, FormGroup } from "reactstrap";
+import isRequired from "../../helpers/isRequired";
 import ReactstrapInput, { ReactstrapRadio } from "../inputs/reactstrapInput/reactstrapInput";
 import { Field } from "formik";
 import FormikBuilder from "../formikBuilder/formikBuilder";
@@ -24,13 +25,17 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 	};
 
 	renderAsRadioGroup(radioGroup, options, ...args) {
-		let inline = radioGroup.isInlined();
+		let inline = this.resolve(radioGroup.isInlined(), options);
+		let label = this.resolve(radioGroup.getLabel(), options);
+		let required = isRequired(radioGroup.id(), options.validationSchema);
 
 		if (options.readOnly) {
 			let value = objectPath.get(options.values, radioGroup.id());
 			let selected = radioGroup.children().find((child) => child.id() === value);
 			if (!selected) {
-				selected = radioGroup.children().find((child) => undefined !== objectPath.get(options.values, child.id()));
+				selected = radioGroup
+					.children()
+					.find((child) => undefined !== objectPath.get(options.values, child.id()));
 			}
 
 			if (!selected) {
@@ -46,7 +51,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 					id={this.buildElementId(options.formId, radioGroup.id())}
 					tag="fieldset"
 				>
-					{radioGroup.label() && <div className="col-form-label">{radioGroup.label()}</div>}
+					{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
 					<div className="radio-group-content">
 						{selected && selected.render(this, {
 							...options,
@@ -67,7 +72,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				id={this.buildElementId(options.formId, radioGroup.id())}
 				tag="fieldset"
 			>
-				{radioGroup.label() && <div className="col-form-label">{radioGroup.label()}</div>}
+				{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
 				<div className="radio-group-content">
 					{radioGroup.children().map((child) => child.render(this, {
 						...options,
@@ -90,7 +95,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				groupName={name}
 				id={this.buildElementId(formId, name, radio.id())}
 				inline={inline}
-				label={` ${this.resolve(radio.label(), options)}`}
+				label={` ${this.resolve(radio.getLabel(), options)}`}
 				name={name}
 				readOnly={readOnly}
 				value={radio.id()}
@@ -100,7 +105,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 
 	renderAsDropdown(dropdown, options) {
 		let { formId, validationSchema, values, setFieldValue, readOnly } = options;
-		let children = dropdown.options();
+		let children = this.resolve(dropdown.options(), options);
 		let id = dropdown.id();
 
 		if (readOnly && undefined === objectPath.get(values, dropdown.id())) {
@@ -113,22 +118,22 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				component={ReactstrapInput}
 				data-id={id}
 				id={this.buildElementId(formId, id)}
-				label={this.resolve(dropdown.label(), options)}
+				label={this.resolve(dropdown.getLabel(), options)}
 				multiple={this.resolve(dropdown.isMultiple(), options)}
 				name={id}
 				readOnly={readOnly}
 				type="select"
 				validationSchema={validationSchema}
 			>
-				{children.map(({ key, label, conditionFn }) => {
+				{children.map(({ value, label, conditionFn = () => true }) => {
 					if (!conditionFn(options)) {
-						if (key === values[id] && children[0].key !== key) {
-							setFieldValue(id, children[0].key);
+						if (value === values[id] && children[0].value !== value) {
+							setFieldValue(id, children[0].value);
 						}
 						return null;
 					}
 
-					return <option key={key} value={key}>{this.resolve(label, options)}</option>;
+					return <option key={value} value={value}>{this.resolve(label, options)}</option>;
 				})}
 			</Field>
 		);
@@ -152,7 +157,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				formIsReadOnly={readOnly}
 				format={input.format()}
 				id={this.buildElementId(formId, input.id())}
-				label={this.resolve(input.label(), options)}
+				label={this.resolve(input.getLabel(), options)}
 				max={addMinMax ? input.max() : undefined}
 				min={addMinMax ? input.min() : undefined}
 				multiple={this.resolve(input.isMultiple(), options)}
@@ -180,7 +185,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				component={ReactstrapInput}
 				data-id={textArea.id()}
 				id={this.buildElementId(formId, textArea.id())}
-				label={this.resolve(textArea.label(), options)}
+				label={this.resolve(textArea.getLabel(), options)}
 				name={textArea.id()}
 				placeholder={this.resolve(textArea.placeholder(), options)}
 				readOnly={readOnly}

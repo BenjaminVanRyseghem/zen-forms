@@ -54,12 +54,12 @@ export default class AbstractInput {
 	}
 
 	label(label) {
-		if (label === undefined) {
-			return this._label;
-		}
-
 		this._label = label;
 		return this;
+	}
+
+	getLabel() {
+		return this._label;
 	}
 
 	transform(fn) {
