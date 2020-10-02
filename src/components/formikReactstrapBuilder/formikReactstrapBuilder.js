@@ -1,8 +1,8 @@
 import { Button, FormGroup } from "reactstrap";
-import isRequired from "../../helpers/isRequired";
 import ReactstrapInput, { ReactstrapRadio } from "../inputs/reactstrapInput/reactstrapInput";
 import { Field } from "formik";
 import FormikBuilder from "../formikBuilder/formikBuilder";
+import isRequired from "../../helpers/isRequired";
 import objectPath from "object-path";
 import PropTypes from "prop-types";
 import React from "react";
@@ -156,6 +156,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				disabled={this.resolve(input.isDisabled(), options)}
 				formIsReadOnly={readOnly}
 				format={input.format()}
+				helper={input.getHelper()}
 				id={this.buildElementId(formId, input.id())}
 				label={this.resolve(input.getLabel(), options)}
 				max={addMinMax ? input.max() : undefined}
@@ -202,7 +203,8 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 	buildFormikProps(formikProps) {
 		return {
 			readOnly: this.props.readOnly,
-			...super.buildFormikProps(formikProps)
+			...super.buildFormikProps(formikProps),
+			validationSchema: this.props.readOnly ? undefined : this.props.validationSchema
 		};
 	}
 

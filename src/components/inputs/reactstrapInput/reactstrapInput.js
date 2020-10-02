@@ -1,4 +1,4 @@
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import isRequired from "../../../helpers/isRequired";
 import objectPath from "object-path";
 import React from "react";
@@ -52,6 +52,7 @@ export default function ReactstrapInput(ref) {
 		field,
 		form,
 		compact,
+		helper,
 		format, // eslint-disable-line no-unused-vars
 		groupClassName = "",
 		validationSchema,
@@ -82,6 +83,7 @@ export default function ReactstrapInput(ref) {
 					/>
 					{rest.label}
 				</Label>}
+				{helper && <FormText className="helper-text" color="muted">{helper}</FormText>}
 				{touched[field.name] && errors[field.name]
 					? <FormFeedback>{errors[field.name]}</FormFeedback>
 					: ""}
@@ -104,6 +106,7 @@ export default function ReactstrapInput(ref) {
 					? function onClick(event) { return inputProps.onClick(event, ref); }
 					: undefined}
 			/>
+			{helper && <FormText className="helper-text" color="muted">{helper}</FormText>}
 			{touched[field.name] && errors[field.name]
 				? <FormFeedback>{errors[field.name]}</FormFeedback>
 				: ""}
