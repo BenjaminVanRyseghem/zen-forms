@@ -13,7 +13,7 @@ $types: map-keys($grid-breakpoints);
 
     .form-group[data-type="checkbox"]:not(.compact), .form-group[data-type="radio"]:not(.compact) {
       .form-check-input {
-        flex: 0 0 !important;
+        flex: 0 0 1em!important;
         margin-left: 0;
       }
     }
@@ -84,7 +84,7 @@ $types: map-keys($grid-breakpoints);
     .form-group {
       @extend .row;
       display: flex;
-      align-items: center;
+      align-items: baseline;
       flex-wrap: wrap;
       margin-right: 0;
     }

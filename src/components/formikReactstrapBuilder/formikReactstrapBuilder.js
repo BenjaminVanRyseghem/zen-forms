@@ -1,8 +1,7 @@
-import { Button, FormGroup } from "reactstrap";
-import ReactstrapInput, { ReactstrapRadio } from "../inputs/reactstrapInput/reactstrapInput";
+import ReactstrapInput, { ReactstrapRadio, ReactstrapRadioGroup } from "../inputs/reactstrapInput/reactstrapInput";
+import { Button } from "reactstrap";
 import { Field } from "formik";
 import FormikBuilder from "../formikBuilder/formikBuilder";
-import isRequired from "../../helpers/isRequired";
 import objectPath from "object-path";
 import PropTypes from "prop-types";
 import React from "react";
@@ -24,63 +23,35 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		readOnly: PropTypes.bool
 	};
 
-	renderAsRadioGroup(radioGroup, options, ...args) {
+	renderAsRadioGroup(radioGroup, options) {
+		let { formId, readOnly, values } = options;
+
 		let inline = this.resolve(radioGroup.isInlined(), options);
-		let label = this.resolve(radioGroup.getLabel(), options);
-		let required = isRequired(radioGroup.id(), options.validationSchema);
 
-		if (options.readOnly) {
-			let value = objectPath.get(options.values, radioGroup.id());
-			let selected = radioGroup.children().find((child) => child.id() === value);
-			if (!selected) {
-				selected = radioGroup
-					.children()
-					.find((child) => undefined !== objectPath.get(options.values, child.id()));
-			}
+		let children = radioGroup.children();
 
-			if (!selected) {
-				return null;
-			}
-
-			return (
-				<FormGroup
-					key={radioGroup.id()}
-					row
-					className="radio-group"
-					data-id={radioGroup.id()}
-					id={this.buildElementId(options.formId, radioGroup.id())}
-					tag="fieldset"
-				>
-					{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
-					<div className="radio-group-content">
-						{selected && selected.render(this, {
-							...options,
-							name: radioGroup.id(),
-							inline
-						}, ...args)}
-					</div>
-				</FormGroup>
-			);
+		if (readOnly && !objectPath.get(values, radioGroup.id())) {
+			return null;
 		}
 
 		return (
-			<FormGroup
+			<Field
 				key={radioGroup.id()}
-				row
-				className="radio-group"
+				component={ReactstrapRadioGroup}
 				data-id={radioGroup.id()}
-				id={this.buildElementId(options.formId, radioGroup.id())}
-				tag="fieldset"
-			>
-				{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
-				<div className="radio-group-content">
-					{radioGroup.children().map((child) => child.render(this, {
-						...options,
-						name: radioGroup.id(),
-						inline
-					}, ...args))}
-				</div>
-			</FormGroup>
+				id={this.buildElementId(formId, radioGroup.id())}
+				label={` ${this.resolve(radioGroup.getLabel(), options)}`}
+				name={radioGroup.id()}
+				radios={children}
+				readOnly={readOnly}
+				renderRadio={(child) => child.render(this, {
+					...options,
+					name: radioGroup.id(),
+					inline
+				})}
+				validationSchema={options.validationSchema}
+				value={objectPath.get(values, radioGroup.id())}
+			/>
 		);
 	}
 
@@ -216,7 +187,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		let { submitProps = {} } = formProps;
 
 		return (
-			<Button disabled={formProps.isSubmitting} type="submit" {...submitProps}>Soumettre</Button>
+			<Button color="primary" disabled={formProps.isSubmitting} type="submit" {...submitProps}>Soumettre</Button>
 		);
 	}
 }

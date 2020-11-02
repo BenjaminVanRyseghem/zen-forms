@@ -1,7 +1,7 @@
-import "./formikBuilder.scss";
 import { Field, Form, Formik } from "formik";
 import PropTypes from "prop-types";
 import React from "react";
+import "./formikBuilder.scss";
 
 const nextId = (() => {
 	let id = 0;
@@ -98,13 +98,20 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderAsGroup(group, ...args) {
+		let children = group.children()
+			.map((child) => this.renderChild(child, ...args))
+			.filter((each) => each);
+		if (!children.length) {
+			return null;
+		}
+
 		if (!group.id()) {
-			return group.children().map((child) => this.renderChild(child, ...args));
+			return children;
 		}
 
 		return (
 			<div key={group.id()} data-id={group.id()} id={this.buildElementId(args[0].formId, group.id())}>
-				{group.children().map((child) => this.renderChild(child, ...args))}
+				{children}
 			</div>
 		);
 	}
@@ -187,20 +194,31 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderChild(child, options) {
+		if (child === null) {
+			return null;
+		}
+
 		if (typeof child === "function") {
 			return this.renderChildren(child(options), options);
+		}
+
+		if (React.isValidElement(child) || typeof child === "string") {
+			return React.cloneElement(child, options);
 		}
 
 		return child.render(this, options);
 	}
 
 	renderChildren(children, options) {
-		let nodes = children;
-		if (nodes.constructor !== Array) {
-			return this.renderChild(nodes, options);
+		if (children === null) {
+			return null;
 		}
 
-		return nodes.map((node) => this.renderChild(node, options));
+		if (children.constructor !== Array) {
+			return this.renderChild(children, options);
+		}
+
+		return children.map((node) => this.renderChild(node, options));
 	}
 
 	renderSpec(children, options) {
@@ -225,6 +243,10 @@ export default class FormikBuilder extends React.Component {
 		);
 	}
 
+	isDirty() {
+		return this.formikProps.dirty;
+	}
+
 	render() {
 		return (
 			<div className={`zen-form ${this.cssClass()} ${this.props.inline ? "inline" : ""}`}>
@@ -234,6 +256,7 @@ export default class FormikBuilder extends React.Component {
 					onSubmit={this.props.onSubmit}
 				>
 					{(formikProps) => {
+						this.formikProps = formikProps;
 						let formProps = this.buildFormikProps(formikProps);
 
 						((fn) => {
