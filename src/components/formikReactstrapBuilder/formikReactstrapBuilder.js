@@ -135,7 +135,8 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 				multiple={this.resolve(input.isMultiple(), options)}
 				name={input.id()}
 				placeholder={this.resolve(input.getPlaceholder(), options)}
-				readOnly={readOnly || input.isReadOnly()(options)}
+				readOnly={readOnly || this.resolve(input.isReadOnly(), options)}
+				step={this.resolve(input.getStep(), options)}
 				transform={input.transform()}
 				type={this.resolve(input.type(), options)}
 				validationSchema={validationSchema}

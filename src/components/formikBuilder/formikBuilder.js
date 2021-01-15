@@ -1,7 +1,7 @@
+import "./formikBuilder.scss";
 import { Field, Form, Formik } from "formik";
 import PropTypes from "prop-types";
 import React from "react";
-import "./formikBuilder.scss";
 
 const nextId = (() => {
 	let id = 0;
@@ -30,6 +30,7 @@ export default class FormikBuilder extends React.Component {
 		initialValues: PropTypes.object.isRequired,
 		inline: PropTypes.bool,
 		noSubmitButton: PropTypes.bool,
+		onChange: PropTypes.func,
 		onSubmit: PropTypes.func,
 		spec: PropTypes.array.isRequired,
 		submitOnChange: PropTypes.bool,
@@ -104,13 +105,21 @@ export default class FormikBuilder extends React.Component {
 		if (!children.length) {
 			return null;
 		}
+		if (group.getLabel() && group.isBordered()) {
+			return (
+				<div key={group.baseId()} className="group bordered" data-id={group.baseId()} id={this.buildElementId(args[0].formId, group.id())}>
+					<div className="label">{group.getLabel()}</div>
+					{children}
+				</div>
+			);
+		}
 
 		if (!group.id()) {
 			return children;
 		}
 
 		return (
-			<div key={group.id()} data-id={group.id()} id={this.buildElementId(args[0].formId, group.id())}>
+			<div key={group.baseId()} data-id={group.baseId()} id={this.buildElementId(args[0].formId, group.id())}>
 				{children}
 			</div>
 		);
@@ -272,6 +281,9 @@ export default class FormikBuilder extends React.Component {
 											}
 										}
 										innerFn(...innerArgs);
+										if (this.props.onChange) {
+											this.props.onChange(...innerArgs);
+										}
 										if (this.props.submitOnChange) {
 											formikProps.handleSubmit();
 										}

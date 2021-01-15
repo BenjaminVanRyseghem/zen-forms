@@ -1,7 +1,7 @@
-import objectPath from "object-path";
-import React from "react";
 import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import isRequired from "../../../helpers/isRequired";
+import objectPath from "object-path";
+import React from "react";
 
 export function ReactstrapRadioGroup(ref) {
 	let {
