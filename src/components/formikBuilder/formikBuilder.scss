@@ -113,7 +113,7 @@ $types: map-keys($grid-breakpoints);
     .form-group {
       @extend .row;
       display: flex;
-      align-items: baseline;
+      align-items: center ;
       flex-wrap: wrap;
       margin-right: 0;
     }

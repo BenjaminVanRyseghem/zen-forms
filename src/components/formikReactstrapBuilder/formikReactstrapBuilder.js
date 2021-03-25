@@ -5,6 +5,7 @@ import FormikBuilder from "../formikBuilder/formikBuilder";
 import objectPath from "object-path";
 import PropTypes from "prop-types";
 import React from "react";
+import ReactstrapPlugin from "../../plugins/reactstrapPlugin";
 
 export default class FormikReactstrapBuilder extends FormikBuilder {
 	static defaultProps = {
@@ -74,7 +75,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 
-	renderAsDropdown(dropdown, options) {
+	renderAsDropdown2(dropdown, options) {
 		let { formId, validationSchema, values, setFieldValue, readOnly } = options;
 		let children = this.resolve(dropdown.options(), options);
 		let id = dropdown.id();
@@ -181,7 +182,7 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 	}
 
 	renderSubmit(formProps) {
-		if (this.props.readOnly) {
+		if (this.props.readOnly || this.props.noSubmitButton || this.props.submitOnChange) {
 			return null;
 		}
 
@@ -192,3 +193,5 @@ export default class FormikReactstrapBuilder extends FormikBuilder {
 		);
 	}
 }
+
+FormikReactstrapBuilder.register(new ReactstrapPlugin());

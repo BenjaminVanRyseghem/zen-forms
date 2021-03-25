@@ -8,6 +8,8 @@ const nextId = (() => {
 	return () => `zen-form-${id++}`;
 })();
 
+const plugins = [];
+
 export default class FormikBuilder extends React.Component {
 	static defaultProps = {
 		additionalData: {},
@@ -36,6 +38,20 @@ export default class FormikBuilder extends React.Component {
 		submitOnChange: PropTypes.bool,
 		validationSchema: PropTypes.object
 	};
+
+	static register(plugin) {
+		plugins.push(plugin);
+		plugin.registerExtensions();
+		return this;
+	}
+
+	constructor() {
+		super(...arguments); // eslint-disable-line prefer-rest-params
+
+		plugins.forEach((plugin) => {
+			plugin.register(this);
+		});
+	}
 
 	state = {};
 
@@ -203,7 +219,7 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderChild(child, options) {
-		if (child === null) {
+		if (child === null || child === undefined) {
 			return null;
 		}
 
@@ -213,6 +229,10 @@ export default class FormikBuilder extends React.Component {
 
 		if (React.isValidElement(child) || typeof child === "string") {
 			return React.cloneElement(child, options);
+		}
+
+		if (child.constructor === Array) {
+			return this.renderChildren(child, options);
 		}
 
 		return child.render(this, options);
@@ -235,6 +255,10 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderSubmit(formProps) {
+		if (this.props.noSubmitButton || this.props.submitOnChange) {
+			return null;
+		}
+
 		return (
 			<button disabled={formProps.isSubmitting} type="submit">Soumettre</button>
 		);
@@ -248,7 +272,7 @@ export default class FormikBuilder extends React.Component {
 				id: this.props.formId
 			},
 			this.renderSpec(this.props.spec, formProps),
-			(!this.props.noSubmitButton || !this.props.submitOnChange) && this.renderSubmit(formProps)
+			this.renderSubmit(formProps)
 		);
 	}
 
