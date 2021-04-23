@@ -1,3 +1,5 @@
+/* eslint max-lines: [2, 350] */
+
 import "./formikBuilder.scss";
 import { Field, Form, Formik } from "formik";
 import PropTypes from "prop-types";
@@ -7,8 +9,6 @@ const nextId = (() => {
 	let id = 0;
 	return () => `zen-form-${id++}`;
 })();
-
-const plugins = [];
 
 export default class FormikBuilder extends React.Component {
 	static defaultProps = {
@@ -40,15 +40,17 @@ export default class FormikBuilder extends React.Component {
 	};
 
 	static register(plugin) {
-		plugins.push(plugin);
-		plugin.registerExtensions();
+		this.plugins = this.plugins || [];
+		this.plugins.push(plugin);
+		plugin.registerExtensions(this);
 		return this;
 	}
 
 	constructor() {
 		super(...arguments); // eslint-disable-line prefer-rest-params
 
-		plugins.forEach((plugin) => {
+		this.constructor.plugins = this.constructor.plugins || [];
+		this.constructor.plugins.forEach((plugin) => {
 			plugin.register(this);
 		});
 	}

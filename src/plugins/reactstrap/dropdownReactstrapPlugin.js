@@ -5,10 +5,6 @@ import objectPath from "object-path";
 import React from "react";
 import ReactstrapInput from "../../components/inputs/reactstrapInput/reactstrapInput";
 
-/**
- * TODO: Write jsdoc
- * @class
- */
 export default class DropdownReactstrapPlugin extends AbstractPlugin {
 	register(_this) {
 		super.register(_this);
