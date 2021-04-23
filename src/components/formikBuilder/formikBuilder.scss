@@ -1,0 +1,150 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/mixins";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/grid";
+
+$types: map-keys($grid-breakpoints);
+
+.zen-form {
+  &.inline {
+    .reactstrapRadio.read-only {
+      padding-left: 0;
+    }
+
+    .form-group[data-type="checkbox"]:not(.compact), .form-group[data-type="radio"]:not(.compact) {
+      .form-check-input {
+        flex: 0 0 1em !important;
+        margin-left: 0;
+      }
+    }
+
+    .form-group[data-type="checkbox"].compact, .form-group[data-type="radio"].compact {
+      flex-direction: row-reverse;
+      align-items: baseline;
+      justify-content: flex-end;
+
+      .checkbox-wrapper {
+        padding-left: 0 !important;
+
+        .form-check-input {
+          margin-left: 0;
+          position: relative;
+        }
+      }
+    }
+
+    .form-check-label {
+      width: 100%;
+    }
+
+    .form-group[data-type="checkbox"].compact, .form-group[data-type="radio"].compact {
+      margin-right: 1ch;
+    }
+  }
+
+  @for $i from 1 through 12 {
+    &.grid-size-#{$i} {
+      @each $type in $types {
+        &.grid-type-#{$type} {
+          .radio-group {
+            .col-form-label {
+              @extend .col-#{$type}-#{12 - $i} !optional;
+            }
+
+            .radio-group-content {
+              @extend .col-#{$type}-#{$i} !optional;
+              padding: 0;
+            }
+          }
+
+          &.inline {
+            .invalid-feedback {
+              @extend .offset-#{$type}-#{12 - $i} !optional;
+              @extend .col-#{$type}-#{$i} !optional;
+            }
+
+            .form-group:not([data-type="checkbox"]) > label:not(:empty), .form-group:not([data-type="radio"]) > label:not(:empty) {
+              @extend .col-#{$type}-#{12 - $i} !optional;
+            }
+
+            .form-group:not([data-type="checkbox"]) > label:not(:empty) + *, .form-group:not([data-type="radio"]) > label:not(:empty) + * {
+              @extend .col-#{$type}-#{$i} !optional;
+            }
+
+            .form-group[data-type="swr-select"] > label:not(:empty) + * {
+              padding-left: 0;
+              padding-right: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .group.bordered {
+    $border-color: #999;
+    border: 1px solid $border-color;
+    position: relative;
+    padding: 1ch;
+
+    &:not(:last-child) {
+      margin-bottom: 2ch;
+    }
+
+    .label {
+      position: absolute;
+      top: -.8em;
+      left: 1em;
+      background: white;
+      padding: 0 10px;
+      color: $border-color;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &.inline {
+    .form-control.is-invalid {
+      padding-right: 0.75rem;
+    }
+
+    .form-group {
+      @extend .row;
+      display: flex;
+      align-items: center ;
+      flex-wrap: wrap;
+      margin-right: 0;
+    }
+
+    .row > * {
+      width: 100%;
+    }
+
+    .form-control.is-invalid[type=number] {
+      background-position: right calc(.375em + .1875rem + 20px) center;
+    }
+
+    label:not(:empty) {
+      margin-top: .5rem;
+
+      &.required {
+        &:after {
+          content: "\00a0*";
+        }
+      }
+    }
+
+    .invalid-feedback {
+      padding-left: 0;
+    }
+
+    fieldset {
+      .form-group {
+        margin-left: 0;
+        margin-bottom: 0;
+      }
+    }
+  }
+}
