@@ -1,3 +1,5 @@
+/* eslint max-lines: [2, 350] */
+
 import "./formikBuilder.scss";
 import { Field, Form, Formik } from "formik";
 import PropTypes from "prop-types";
@@ -30,11 +32,28 @@ export default class FormikBuilder extends React.Component {
 		initialValues: PropTypes.object.isRequired,
 		inline: PropTypes.bool,
 		noSubmitButton: PropTypes.bool,
+		onChange: PropTypes.func,
 		onSubmit: PropTypes.func,
 		spec: PropTypes.array.isRequired,
 		submitOnChange: PropTypes.bool,
 		validationSchema: PropTypes.object
 	};
+
+	static register(plugin) {
+		this.plugins = this.plugins || [];
+		this.plugins.push(plugin);
+		plugin.registerExtensions(this);
+		return this;
+	}
+
+	constructor() {
+		super(...arguments); // eslint-disable-line prefer-rest-params
+
+		this.constructor.plugins = this.constructor.plugins || [];
+		this.constructor.plugins.forEach((plugin) => {
+			plugin.register(this);
+		});
+	}
 
 	state = {};
 
@@ -98,13 +117,28 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderAsGroup(group, ...args) {
+		let children = group.children()
+			.map((child) => this.renderChild(child, ...args))
+			.filter((each) => each);
+		if (!children.length) {
+			return null;
+		}
+		if (group.getLabel() && group.isBordered()) {
+			return (
+				<div key={group.baseId()} className="group bordered" data-id={group.baseId()} id={this.buildElementId(args[0].formId, group.id())}>
+					<div className="label">{group.getLabel()}</div>
+					{children}
+				</div>
+			);
+		}
+
 		if (!group.id()) {
-			return group.children().map((child) => this.renderChild(child, ...args));
+			return children;
 		}
 
 		return (
-			<div key={group.id()} data-id={group.id()} id={this.buildElementId(args[0].formId, group.id())}>
-				{group.children().map((child) => this.renderChild(child, ...args))}
+			<div key={group.baseId()} data-id={group.baseId()} id={this.buildElementId(args[0].formId, group.id())}>
+				{children}
 			</div>
 		);
 	}
@@ -187,20 +221,35 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderChild(child, options) {
+		if (child === null || child === undefined) {
+			return null;
+		}
+
 		if (typeof child === "function") {
 			return this.renderChildren(child(options), options);
+		}
+
+		if (React.isValidElement(child) || typeof child === "string") {
+			return React.cloneElement(child, options);
+		}
+
+		if (child.constructor === Array) {
+			return this.renderChildren(child, options);
 		}
 
 		return child.render(this, options);
 	}
 
 	renderChildren(children, options) {
-		let nodes = children;
-		if (nodes.constructor !== Array) {
-			return this.renderChild(nodes, options);
+		if (children === null) {
+			return null;
 		}
 
-		return nodes.map((node) => this.renderChild(node, options));
+		if (children.constructor !== Array) {
+			return this.renderChild(children, options);
+		}
+
+		return children.map((node) => this.renderChild(node, options));
 	}
 
 	renderSpec(children, options) {
@@ -208,6 +257,10 @@ export default class FormikBuilder extends React.Component {
 	}
 
 	renderSubmit(formProps) {
+		if (this.props.noSubmitButton || this.props.submitOnChange) {
+			return null;
+		}
+
 		return (
 			<button disabled={formProps.isSubmitting} type="submit">Soumettre</button>
 		);
@@ -221,8 +274,12 @@ export default class FormikBuilder extends React.Component {
 				id: this.props.formId
 			},
 			this.renderSpec(this.props.spec, formProps),
-			(!this.props.noSubmitButton || !this.props.submitOnChange) && this.renderSubmit(formProps)
+			this.renderSubmit(formProps)
 		);
+	}
+
+	isDirty() {
+		return this.formikProps.dirty;
 	}
 
 	render() {
@@ -234,6 +291,7 @@ export default class FormikBuilder extends React.Component {
 					onSubmit={this.props.onSubmit}
 				>
 					{(formikProps) => {
+						this.formikProps = formikProps;
 						let formProps = this.buildFormikProps(formikProps);
 
 						((fn) => {
@@ -249,6 +307,9 @@ export default class FormikBuilder extends React.Component {
 											}
 										}
 										innerFn(...innerArgs);
+										if (this.props.onChange) {
+											this.props.onChange(...innerArgs);
+										}
 										if (this.props.submitOnChange) {
 											formikProps.handleSubmit();
 										}

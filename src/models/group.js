@@ -21,6 +21,15 @@ export default class Group extends AbstractInput {
 		return this._children;
 	}
 
+	bordered() {
+		this._bordered = true;
+		return this;
+	}
+
+	isBordered() {
+		return this._bordered;
+	}
+
 	renderContent(renderer, ...args) {
 		return renderer.renderAsGroup(this, ...args);
 	}

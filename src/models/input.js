@@ -12,6 +12,16 @@ export default class Input extends AbstractInput {
 		this._multiple = false;
 		this._placeholder = undefined;
 		this._compact = false;
+		this._step = 1;
+	}
+
+	step(number) {
+		this._step = number;
+		return this;
+	}
+
+	getStep() {
+		return this._step;
 	}
 
 	type() {
@@ -23,6 +33,10 @@ export default class Input extends AbstractInput {
 		return this;
 	}
 
+	getPlaceholder() {
+		return this._placeholder;
+	}
+
 	compact() {
 		this._compact = true;
 		return this;
@@ -30,10 +44,6 @@ export default class Input extends AbstractInput {
 
 	isCompact() {
 		return this._compact;
-	}
-
-	getPlaceholder() {
-		return this._placeholder;
 	}
 
 	min(min) {

@@ -1,7 +1,77 @@
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import isRequired from "../../../helpers/isRequired";
 import objectPath from "object-path";
 import React from "react";
+
+export function ReactstrapRadioGroup(ref) {
+	let {
+		field,
+		form,
+		label,
+		validationSchema,
+		readOnly,
+		value,
+		values,
+		radios,
+		renderRadio,
+		...rest
+	} = ref;
+	let dataId = rest["data-id"];
+	delete rest["data-id"];
+	let { touched, errors } = form;
+	let required = isRequired(field.name, validationSchema);
+	let inputProps = Object.assign(
+		{},
+		rest,
+		field,
+		{
+			invalid: Boolean(touched[field.name] && errors[field.name]) || undefined
+		}
+	);
+
+	if (readOnly) {
+		let selected = radios.find((child) => child.id() === value);
+		if (!selected) {
+			selected = radios.find((child) => undefined !== objectPath.get(values, child.id()));
+		}
+		if (!selected) {
+			return null;
+		}
+
+		return (
+			<FormGroup
+				key={dataId}
+				row
+				{...inputProps}
+				className="radio-group"
+				data-id={dataId}
+			>
+				{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
+				<div className="radio-group-content">
+					{selected && renderRadio(selected)}
+				</div>
+			</FormGroup>
+		);
+	}
+
+	return (
+		<FormGroup
+			key={dataId}
+			row
+			{...inputProps}
+			className="radio-group"
+			data-id={dataId}
+		>
+			{label && <label className={`col-form-label ${required ? "required" : ""}`}>{label}</label>}
+			<div className={`radio-group-content ${inputProps.invalid ? "is-invalid" : ""}`}>
+				{radios.map((child) => renderRadio(child))}
+			</div>
+			{touched[field.name] && errors[field.name]
+				? <FormFeedback>{errors[field.name]}</FormFeedback>
+				: ""}
+		</FormGroup>
+	);
+}
 
 export function ReactstrapRadio(ref) {
 	let {
@@ -52,6 +122,8 @@ export default function ReactstrapInput(ref) {
 		field,
 		form,
 		compact,
+		helper,
+		formIsReadOnly: _,
 		format, // eslint-disable-line no-unused-vars
 		groupClassName = "",
 		validationSchema,
@@ -82,6 +154,7 @@ export default function ReactstrapInput(ref) {
 					/>
 					{rest.label}
 				</Label>}
+				{helper && <FormText className="helper-text" color="muted">{helper}</FormText>}
 				{touched[field.name] && errors[field.name]
 					? <FormFeedback>{errors[field.name]}</FormFeedback>
 					: ""}
@@ -104,6 +177,7 @@ export default function ReactstrapInput(ref) {
 					? function onClick(event) { return inputProps.onClick(event, ref); }
 					: undefined}
 			/>
+			{helper && <FormText className="helper-text" color="muted">{helper}</FormText>}
 			{touched[field.name] && errors[field.name]
 				? <FormFeedback>{errors[field.name]}</FormFeedback>
 				: ""}

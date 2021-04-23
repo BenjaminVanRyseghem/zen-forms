@@ -13,7 +13,7 @@ $types: map-keys($grid-breakpoints);
 
     .form-group[data-type="checkbox"]:not(.compact), .form-group[data-type="radio"]:not(.compact) {
       .form-check-input {
-        flex: 0 0 !important;
+        flex: 0 0 1em !important;
         margin-left: 0;
       }
     }
@@ -70,9 +70,38 @@ $types: map-keys($grid-breakpoints);
             .form-group:not([data-type="checkbox"]) > label:not(:empty) + *, .form-group:not([data-type="radio"]) > label:not(:empty) + * {
               @extend .col-#{$type}-#{$i} !optional;
             }
+
+            .form-group[data-type="swr-select"] > label:not(:empty) + * {
+              padding-left: 0;
+              padding-right: 0;
+            }
           }
         }
       }
+    }
+  }
+
+  .group.bordered {
+    $border-color: #999;
+    border: 1px solid $border-color;
+    position: relative;
+    padding: 1ch;
+
+    &:not(:last-child) {
+      margin-bottom: 2ch;
+    }
+
+    .label {
+      position: absolute;
+      top: -.8em;
+      left: 1em;
+      background: white;
+      padding: 0 10px;
+      color: $border-color;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
     }
   }
 
@@ -84,7 +113,7 @@ $types: map-keys($grid-breakpoints);
     .form-group {
       @extend .row;
       display: flex;
-      align-items: center;
+      align-items: center ;
       flex-wrap: wrap;
       margin-right: 0;
     }

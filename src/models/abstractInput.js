@@ -36,6 +36,15 @@ export default class AbstractInput {
 		return this;
 	}
 
+	helper(string) {
+		this._helper = string;
+		return this;
+	}
+
+	getHelper() {
+		return this._helper;
+	}
+
 	isReadOnly() {
 		return this._readOnly || (() => false);
 	}
