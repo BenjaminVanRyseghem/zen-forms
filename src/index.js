@@ -1,5 +1,5 @@
+import * as formik from "formik";
 import AbstractPlugin from "./models/abstractPlugin";
-import formik from "formik";
 import FormikBuilder from "./components/formikBuilder/formikBuilder";
 import FormikReactstrapBuilder from "./components/formikReactstrapBuilder/formikReactstrapBuilder";
 import isRequired from "./helpers/isRequired";
