@@ -16,6 +16,7 @@ export default class FormikBuilder extends React.Component {
 		component: Form,
 		formClassName: "",
 		inline: false,
+		initialValues: {},
 		noSubmitButton: false,
 		onSubmit: () => {},
 		submitOnChange: false
@@ -29,7 +30,7 @@ export default class FormikBuilder extends React.Component {
 		]),
 		formClassName: PropTypes.string,
 		formId: PropTypes.string,
-		initialValues: PropTypes.object.isRequired,
+		initialValues: PropTypes.object,
 		inline: PropTypes.bool,
 		noSubmitButton: PropTypes.bool,
 		onChange: PropTypes.func,
