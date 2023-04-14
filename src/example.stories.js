@@ -9,10 +9,8 @@ export default {
 };
 
 const spec = [
-	new Input("name")
-		.label("Name"),
-	new Input("age")
-		.number()
+	new Input("name").label("Name"),
+	new Input("age").number()
 		.label("Age"),
 	new Dropdown("job", ({ values }) => values.age > 18)
 		.label("What's your job")
@@ -27,9 +25,7 @@ const personData = {
 };
 
 const validation = Yup.object().shape({
-	age: Yup
-		.number()
-		.positive()
+	age: Yup.number().positive()
 		.integer()
 		.required("Required"),
 	name: Yup.string().required("Required")
@@ -56,19 +52,13 @@ function CreateAPersonForm() {
 }
 
 function ViewAPersonForm({ person }) {
-	return (
-		<FormikReactstrapBuilder
-			inline
-			readOnly
-			initialValues={person}
-			spec={spec}
-		/>
-	);
+	return <FormikReactstrapBuilder inline readOnly initialValues={person} spec={spec}/>;
 }
 
 export const create = () => <CreateAPersonForm/>;
-export const create2 = () => <div>Plop</div>;
-export const show = ({ person }) => <ViewAPersonForm person={person}/>;
-show.args = {
-	person: personData
+export const show = {
+	render: ({ person }) => <ViewAPersonForm person={person}/>,
+	args: {
+		person: personData
+	}
 };
